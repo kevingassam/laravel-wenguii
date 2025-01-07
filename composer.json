@@ -1,8 +1,13 @@
 {
     "name": "gassam_kevin/laravel-wenguii",
     "description": "Laravel package for WenGuii API integration",
+    "keywords": ["laravel", "wenguii", "billing"],
     "type": "library",
     "license": "MIT",
+    "support": {
+        "issues": "https://github.com/kevingassam/laravel-wenguii/issues",
+        "source": "https://github.com/kevingassam/laravel-wenguii"
+    },
     "autoload": {
         "psr-4": {
             "Wenguii\\": "src/"
