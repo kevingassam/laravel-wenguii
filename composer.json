@@ -22,8 +22,8 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": "^8.0",
-        "guzzlehttp/guzzle": "^7.0",
+        "php": ">=7.0.0",
+        "guzzlehttp/guzzle": "^6.3",
         "illuminate/support": "^9.0|^10.0"
     },
     "repositories": [
