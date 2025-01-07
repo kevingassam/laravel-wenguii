@@ -1,0 +1,31 @@
+{
+    "name": "gassam_kevin/laravel-wenguii",
+    "description": "Laravel package for WenGuii API integration",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Wenguii\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Gassam Kevin",
+            "email": "contact@kg-code.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^8.0",
+        "guzzlehttp/guzzle": "^7.0",
+        "illuminate/support": "^9.0|^10.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Wenguii\\WenguiiServiceProvider"
+            ]
+        }
+    }
+}
