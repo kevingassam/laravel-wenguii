@@ -13,22 +13,28 @@ class WenguiiClient
     protected $usr;
     protected $pwd;
 
-    public function __construct(string $cdprt, string $usr, string $pwd, string $baseUrl = 'https://wenguii.net/')
+    public function __construct()
     {
-        $this->baseUrl = $baseUrl;
-        $this->cdprt = $cdprt;
-        $this->usr = $usr;
-        $this->pwd = $pwd;
+        $this->baseUrl = env('WENGUII_BASE_URL', 'https://wenguii.net/');  
+        $this->cdprt = env('WENGUII_CDPRT');
+        $this->usr = env('WENGUII_USR');
+        $this->pwd = env('WENGUII_PWD');
+
+         // Vérifier si les informations d'identification sont présentes
+         if (empty($this->cdprt) || empty($this->usr) || empty($this->pwd)) {
+            throw new \Exception("Les informations d'identification sont manquantes dans le fichier .env.");
+        }
+
+        // Créer le client Guzzle
         $this->client = new Client([
             'base_uri' => $this->baseUrl,
             'timeout' => 30,
         ]);
     }
-
     /**
      * Effectuer un paiement
      */
-    public function payment(string $expediteurPhone, float $montant): array
+    public  function payment(string $expediteurPhone, float $montant): array
     {
         $response = $this->makeRequest('PAIEMENTP', [
             'EXPO' => $expediteurPhone,
@@ -45,7 +51,7 @@ class WenguiiClient
     /**
      * Effectuer un retrait
      */
-    public function withdrawal(string $beneficiairePhone, float $montant): array
+    public  function withdrawal(string $beneficiairePhone, float $montant): array
     {
         $response = $this->makeRequest('DEPOTP', [
             'BENO' => $beneficiairePhone,
@@ -62,7 +68,7 @@ class WenguiiClient
     /**
      * Vérifier l'état d'une transaction
      */
-    public function checkStatus(string $transactionId): array
+    public  function checkStatus(string $transactionId): array
     {
         $response = $this->makeRequest('ETATO', [
             'IDO' => $transactionId,
@@ -71,10 +77,18 @@ class WenguiiClient
         return $response;
     }
 
+
+    private function verifyCredentials()
+    {
+        if (empty($this->cdprt) || empty($this->usr) || empty($this->pwd)) {
+            throw new \Exception("Les informations d'identification sont manquantes.");
+        }
+    }
+
     /**
      * Consulter le solde
      */
-    public function getBalance(): array
+    public  function getBalance(): array
     {
         $response = $this->makeRequest('SOLDE', []);
 
@@ -87,6 +101,8 @@ class WenguiiClient
 
     protected function makeRequest(string $endpoint, array $params): array
     {
+        $this->verifyCredentials();
+
         $params = array_merge($params, [
             'CDPRT' => $this->cdprt,
             'USR' => $this->usr,

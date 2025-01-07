@@ -1,5 +1,6 @@
 {
     "name": "wenguii/laravel-wenguii",
+    "version": "1.0.0",
     "description": "Laravel package for WenGuii API integration",
     "keywords": [
         "laravel",
@@ -35,9 +36,10 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": "^7.1|^8.0",
-        "guzzlehttp/guzzle": "^6.3",
-        "illuminate/support": "^5.6|^5.7|^5.8|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0"
+        "php": "^7.0|^8.0",
+        "guzzlehttp/guzzle": "^7.8", 
+        "illuminate/support": "^7.0|^8.0|^9.0|^10.0|^11.0", 
+        "league/flysystem": "^3.25"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5"
