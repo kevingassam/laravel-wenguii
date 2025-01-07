@@ -21,6 +21,12 @@
         "guzzlehttp/guzzle": "^7.0",
         "illuminate/support": "^9.0|^10.0"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/gassam-kevin/laravel-wenguii"
+        }
+    ],
     "extra": {
         "laravel": {
             "providers": [
