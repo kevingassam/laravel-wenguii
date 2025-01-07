@@ -1,3 +1,4 @@
+<img src="images/logo.png" alt="Logo" width="80" height="80">
 # Laravel WenGuii
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/kevingassam/laravel-wenguii.svg)](https://packagist.org/packages/kevingassam/laravel-wenguii)
@@ -16,7 +17,18 @@ composer require kevingassam/laravel-wenguii
 Publiez le fichier de configuration :
 
 ```bash
-php artisan vendor:publish --tag=wenguii-config
+php artisan vendor:publish --provider="Wenguii\WenguiiServiceProvider" --tag="config"
+```
+
+## Finalisation
+
+Pour que Laravel reconnaisse votre ServiceProvider, vous devez l'ajouter à la liste des providers dans le fichier config/app.php de l'application Laravel, comme suit :
+
+```bash
+'providers' => [
+    // Autres providers...
+    Wenguii\WenguiiServiceProvider::class,
+],
 ```
 
 Ajoutez vos credentials dans votre fichier `.env` :
