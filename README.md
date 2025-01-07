@@ -3,7 +3,12 @@
 ## Laravel WenGuii
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/kevingassam/laravel-wenguii.svg)](https://packagist.org/packages/kevingassam/laravel-wenguii)
-[![License](https://img.shields.io/packagist/l/kevingassam/laravel-wenguii.svg)](https://github.com/kevingassam/laravel-wenguii/blob/main/LICENSE.txt)
+[![License](https://img.shields.io/packagist/l/kevingassam/laravel-wenguii.svg)](https://github.com/kevingassam/laravel-wenguii/blob/main/LICENSE.md)
+[![Total Downloads](https://img.shields.io/packagist/dt/kevingassam/laravel-wenguii.svg)](https://packagist.org/packages/kevingassam/laravel-wenguii)
+[![GitHub issues](https://img.shields.io/github/issues/kevingassam/laravel-wenguii.svg)](https://github.com/kevingassam/laravel-wenguii/issues)
+[![GitHub stars](https://img.shields.io/github/stars/kevingassam/laravel-wenguii.svg?style=social)](https://github.com/kevingassam/laravel-wenguii/stargazers)
+
+
 
 Une bibliothèque Laravel pour intégrer facilement l'API de paiement WenGuii dans vos applications.
 
@@ -21,16 +26,6 @@ Publiez le fichier de configuration :
 php artisan vendor:publish --provider="Wenguii\WenguiiServiceProvider" --tag="config"
 ```
 
-## Finalisation
-
-Pour que Laravel reconnaisse votre ServiceProvider, vous devez l'ajouter à la liste des providers dans le fichier config/app.php de l'application Laravel, comme suit :
-
-```bash
-'providers' => [
-    // Autres providers...
-    Wenguii\WenguiiServiceProvider::class,
-],
-```
 
 Ajoutez vos credentials dans votre fichier `.env` :
 
