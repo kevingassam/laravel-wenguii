@@ -1,14 +1,14 @@
 # Laravel WenGuii
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/votre-nom/laravel-wenguii.svg)](https://packagist.org/packages/votre-nom/laravel-wenguii)
-[![License](https://img.shields.io/packagist/l/votre-nom/laravel-wenguii.svg)](https://github.com/votre-nom/laravel-wenguii/blob/main/LICENSE.md)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/kevingassam/laravel-wenguii.svg)](https://packagist.org/packages/kevingassam/laravel-wenguii)
+[![License](https://img.shields.io/packagist/l/kevingassam/laravel-wenguii.svg)](https://github.com/kevingassam/laravel-wenguii/blob/main/LICENSE.txt)
 
 Une bibliothèque Laravel pour intégrer facilement l'API de paiement WenGuii dans vos applications.
 
 ## Installation
 
 ```bash
-composer require votre-nom/laravel-wenguii
+composer require kevingassam/laravel-wenguii
 ```
 
 ## Configuration
