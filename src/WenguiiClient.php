@@ -12,115 +12,34 @@ class WenguiiClient
     protected $cdprt;
     protected $usr;
     protected $pwd;
+    protected $endUrl;
 
     public function __construct()
     {
-        $this->baseUrl = env('WENGUII_BASE_URL', 'https://wenguii.net/');  
+        $this->baseUrl = env('WENGUII_BASE_URL', 'https://wenguii.net/');
         $this->cdprt = env('WENGUII_CDPRT');
         $this->usr = env('WENGUII_USR');
         $this->pwd = env('WENGUII_PWD');
+        $this->endUrl = $this->cdprt . '/' . $this->usr . '/' . $this->pwd;
 
-         // Vérifier si les informations d'identification sont présentes
-         if (empty($this->cdprt) || empty($this->usr) || empty($this->pwd)) {
-            throw new \Exception("Les informations d'identification sont manquantes dans le fichier .env.");
-        }
+        $this->verifyCredentials();
 
         // Créer le client Guzzle
-        $this->client = new Client([
-            'base_uri' => $this->baseUrl,
-            'timeout' => 30,
-        ]);
+        $this->client = new Client();
     }
     /**
      * Effectuer un paiement
      */
-    public  function payment(string $expediteurPhone, float $montant): array
+    public function payment(string $expediteurPhone, float $montant): array
     {
-        $response = $this->makeRequest('PAIEMENTP', [
-            'EXPO' => $expediteurPhone,
-            'MONTO' => $montant,
-        ]);
-
-        if ($response['ETAT'] !== 200) {
-            throw new WenguiiException($this->getPaymentErrorMessage($response['ETAT']));
+        $url = $this->baseUrl . 'PAIEMENTP/' . $expediteurPhone . '/' . $montant . '/' . $this->endUrl;
+        $response = $this->client->get($url);
+        $data = json_decode($response->getBody(), true);
+        if (!isset($data['ETAT'])) {
+            throw new \Exception("La clé 'ETAT' est manquante dans la réponse de l'API.");
         }
-
-        return $response;
-    }
-
-    /**
-     * Effectuer un retrait
-     */
-    public  function withdrawal(string $beneficiairePhone, float $montant): array
-    {
-        $response = $this->makeRequest('DEPOTP', [
-            'BENO' => $beneficiairePhone,
-            'MONTO' => $montant,
-        ]);
-
-        if ($response['ETAT'] !== 300) {
-            throw new WenguiiException($this->getWithdrawalErrorMessage($response['ETAT']));
-        }
-
-        return $response;
-    }
-
-    /**
-     * Vérifier l'état d'une transaction
-     */
-    public  function checkStatus(string $transactionId): array
-    {
-        $response = $this->makeRequest('ETATO', [
-            'IDO' => $transactionId,
-        ]);
-
-        return $response;
-    }
-
-
-    private function verifyCredentials()
-    {
-        if (empty($this->cdprt) || empty($this->usr) || empty($this->pwd)) {
-            throw new \Exception("Les informations d'identification sont manquantes.");
-        }
-    }
-
-    /**
-     * Consulter le solde
-     */
-    public  function getBalance(): array
-    {
-        $response = $this->makeRequest('SOLDE', []);
-
-        if ($response['ETAT'] !== 200) {
-            throw new WenguiiException($this->getBalanceErrorMessage($response['ETAT']));
-        }
-
-        return $response;
-    }
-
-    protected function makeRequest(string $endpoint, array $params): array
-    {
-        $this->verifyCredentials();
-
-        $params = array_merge($params, [
-            'CDPRT' => $this->cdprt,
-            'USR' => $this->usr,
-            'PWD' => $this->pwd,
-        ]);
-
-        try {
-            $path = "/{$endpoint}/" . implode('/', array_values($params));
-            $response = $this->client->get($path);
-            return json_decode($response->getBody()->getContents(), true);
-        } catch (Exception $e) {
-            throw new WenguiiException("Erreur lors de la requête API: " . $e->getMessage());
-        }
-    }
-
-    protected function getPaymentErrorMessage(int $code): string
-    {
-        return match ($code) {
+        $code = $data['ETAT'];
+        $errorCodes = [
             201 => "Échec d'envoi",
             202 => "Mot de passe erroné",
             203 => "Utilisateur inactif",
@@ -128,13 +47,28 @@ class WenguiiClient
             205 => "Utilisateur non trouvé",
             500 => "Partenaire désactivé",
             501 => "Partenaire inexistant",
-            default => "Erreur inconnue",
-        };
+            200 => "La transaction a été initialisée",
+        ];
+        if (isset($errorCodes[$code])) {
+            $data['MESSAGE'] = $errorCodes[$code];
+        }
+        return $data;
     }
 
-    protected function getWithdrawalErrorMessage(int $code): string
+    /**
+     * Effectuer un retrait
+     */
+    public  function withdrawal(string $beneficiairePhone, float $montant): array
     {
-        return match ($code) {
+        $url = $this->baseUrl . 'DEPOTP/' . $beneficiairePhone . '/' . $montant . '/' . $this->endUrl;
+        $response = $this->client->get($url);
+        $data = json_decode($response->getBody(), true);
+        if (!isset($data['ETAT'])) {
+            throw new \Exception("La clé 'ETAT' est manquante dans la réponse de l'API.");
+        }
+        $code = $data['ETAT'];
+        $errorCodes = [
+            300 => "Le retrait à été initié",
             301 => "Échec d'envoi",
             302 => "Mot de passe erroné",
             303 => "Utilisateur inactif",
@@ -144,21 +78,83 @@ class WenguiiClient
             307 => "Solde partenaire insuffisant",
             500 => "Partenaire désactivé",
             501 => "Partenaire inexistant",
-            default => "Erreur inconnue",
-        };
+        ];
+        if (isset($errorCodes[$code])) {
+            $data['MESSAGE'] = $errorCodes[$code];
+        }
+        return $data;
     }
 
-    protected function getBalanceErrorMessage(int $code): string
+    /**
+     * Vérifier l'état d'une transaction
+     */
+    public  function checkStatus(string $transactionId): array
     {
-        return match ($code) {
+        $url = $this->baseUrl . 'ETATO/' . $transactionId . '/' . $this->endUrl;
+        $response = $this->client->get($url);
+        $data = json_decode($response->getBody(), true);
+        if (!isset($data['ETAT'])) {
+            throw new \Exception("La clé 'ETAT' est manquante dans la réponse de l'API.");
+        }
+        $code = $data['ETAT'];
+        $errorCodes = [
+            400 => 'La transaction à été trouvée',
+            401 => "Transaction en cours de paiement",
+            402 => "Transaction en attente de validation",
+            403 => "Transaction annulée",
+            404 => "Transaction inexistante",
             202 => "Mot de passe erroné",
             203 => "Utilisateur inactif",
             204 => "Code partenaire erroné",
             205 => "Utilisateur non trouvé",
             500 => "Partenaire inactif",
             501 => "Partenaire inexistant",
-            default => "Erreur inconnue",
-        };
+        ];
+        if (isset($errorCodes[$code])) {
+            $data['MESSAGE'] = $errorCodes[$code];
+        }
+        return $data;
+    }
+
+
+    private function verifyCredentials()
+    {
+        if (empty($this->cdprt)) {
+            throw new \Exception("Le champ 'cdprt' est manquant.");
+        }
+        if (empty($this->usr)) {
+            throw new \Exception("Le champ 'usr' est manquant.");
+        }
+        if (empty($this->pwd)) {
+            throw new \Exception("Le champ 'pwd' est manquant.");
+        }
+    }
+
+    /**
+     * Consulter le solde
+     */
+    public  function getBalance(): array
+    {
+        $url = $this->baseUrl . 'SOLDE/' . $this->endUrl;
+        $response = $this->client->get($url);
+        $data = json_decode($response->getBody(), true);
+        if (!isset($data['ETAT'])) {
+            throw new \Exception("La clé 'ETAT' est manquante dans la réponse de l'API.");
+        }
+        $code = $data['ETAT'];
+        $errorCodes = [
+            200 => "Le solde a été récupéré avec succès",
+            202 => "Mot de passe erroné",
+            203 => "Utilisateur inactif",
+            204 => "Code partenaire erroné",
+            205 => "Utilisateur non trouvé",
+            500 => "Partenaire inactif",
+            501 => "Partenaire inexistant",
+        ];
+        if (isset($errorCodes[$code])) {
+            $data['MESSAGE'] = $errorCodes[$code];
+        }
+        return $data;
     }
 }
 
