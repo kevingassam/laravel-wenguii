@@ -15,7 +15,7 @@ Une bibliothèque Laravel pour intégrer facilement l'API de paiement WenGuii da
 ## Installation
 
 ```bash
-composer require wenguii/laravel-wenguii
+composer require wenguii/laravel-wenguii:1.0.0
 ```
 
 ## Configuration
